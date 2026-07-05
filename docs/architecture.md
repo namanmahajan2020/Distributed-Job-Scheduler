@@ -1,20 +1,30 @@
-# Architecture
+# System Architecture
 
 ```mermaid
 flowchart LR
-  Browser[React Dashboard] --> API[Express API + Socket.IO]
-  API --> PG[(PostgreSQL + Prisma)]
-  API --> Scheduler[Cron Promotion + Recovery]
-  WorkerA[Worker 1] --> PG
-  WorkerB[Worker N] --> PG
+  Operator[Operator Browser]
+  Web[React Dashboard]
+  API[Express API<br/>Auth + Control Plane + Swagger + Socket.IO]
+  Scheduler[Scheduler Loop<br/>Cron Promotion + Recovery + Recurring Trigger]
+  WorkerA[Worker Runtime A]
+  WorkerB[Worker Runtime B]
+  DB[(PostgreSQL)]
+
+  Operator --> Web
+  Web --> API
+  API --> DB
+  API --> Scheduler
+  Scheduler --> DB
+  WorkerA --> DB
+  WorkerB --> DB
   API --> WorkerA
   API --> WorkerB
+  API --> Web
 ```
 
-## Execution Flow
+## Notes
 
-1. Clients enqueue jobs through the API.
-2. Jobs land in `QUEUED` or `SCHEDULED`.
-3. Workers atomically claim eligible jobs with `FOR UPDATE SKIP LOCKED`.
-4. Job execution records and logs are persisted per attempt.
-5. Failures either reschedule using retry policy or move to DLQ.
+- PostgreSQL is the system of record for queues, jobs, retries, worker liveness, and sessions.
+- The API is the control plane and owns security, orchestration, and visibility concerns.
+- Workers are horizontally scalable executors that coordinate exclusively through the database.
+- Socket.IO is used for operational feedback rather than work distribution.

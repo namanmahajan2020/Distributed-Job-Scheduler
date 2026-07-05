@@ -1,4 +1,4 @@
-# Sequence Diagram
+# Job Execution Sequence
 
 ```mermaid
 sequenceDiagram
@@ -6,20 +6,22 @@ sequenceDiagram
   participant API
   participant DB as PostgreSQL
   participant Worker
+  participant UI as Dashboard
 
-  Client->>API: POST /jobs
-  API->>DB: insert job(status=QUEUED)
-  Worker->>DB: claim eligible jobs with SKIP LOCKED
-  DB-->>Worker: claimed job ids
-  Worker->>DB: update status RUNNING + create execution
-  Worker->>Worker: execute handler
-  alt success
-    Worker->>DB: update COMPLETED + output + logs
-    Worker-->>API: heartbeat/status
-  else failure with retries left
-    Worker->>DB: update RETRYING + scheduledFor
-  else retry limit exceeded
-    Worker->>DB: update DEAD_LETTER + DLQ entry
+  Client->>API: POST /api/jobs
+  API->>DB: Insert job
+  API-->>Client: 201 Created
+  Worker->>DB: Claim eligible jobs with SKIP LOCKED
+  DB-->>Worker: Job ids
+  Worker->>DB: Update job to RUNNING
+  Worker->>Worker: Execute handler
+  alt Success
+    Worker->>DB: Persist COMPLETED output and execution row
+  else Retryable Failure
+    Worker->>DB: Persist RETRYING and next scheduled time
+  else Terminal Failure
+    Worker->>DB: Persist DEAD_LETTER and DLQ entry
   end
-  API-->>Client: realtime updates over Socket.IO
+  API->>DB: Poll and aggregate snapshot data
+  API-->>UI: Emit Socket.IO updates
 ```
