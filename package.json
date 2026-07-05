@@ -11,9 +11,12 @@
     "dev:api": "npm run dev -w @scheduler/api",
     "dev:web": "npm run dev -w @scheduler/web",
     "dev:worker": "npm run dev -w @scheduler/worker",
+    "start:api": "npm run start -w @scheduler/api",
+    "start:worker": "npm run start -w @scheduler/worker",
     "test": "npm run test -w @scheduler/api",
     "prisma:generate": "npm run prisma:generate -w @scheduler/api",
     "prisma:migrate": "npm run prisma:migrate -w @scheduler/api",
+    "prisma:migrate:deploy": "npm run prisma:migrate:deploy -w @scheduler/api",
     "seed": "npm run seed -w @scheduler/api"
   }
 }
