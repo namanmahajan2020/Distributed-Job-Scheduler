@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.env.local
+coverage
+.turbo
+*.log
+apps/web/.vite
+apps/web/dist
+apps/api/openapi.json

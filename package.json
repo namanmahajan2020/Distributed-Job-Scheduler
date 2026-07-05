@@ -1,0 +1,19 @@
+{
+  "name": "distributed-job-scheduler",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run prisma:generate -w @scheduler/api && npm run build -w @scheduler/shared && npm run build -w @scheduler/api && npm run build -w @scheduler/worker && npm run build -w @scheduler/web",
+    "dev:api": "npm run dev -w @scheduler/api",
+    "dev:web": "npm run dev -w @scheduler/web",
+    "dev:worker": "npm run dev -w @scheduler/worker",
+    "test": "npm run test -w @scheduler/api",
+    "prisma:generate": "npm run prisma:generate -w @scheduler/api",
+    "prisma:migrate": "npm run prisma:migrate -w @scheduler/api",
+    "seed": "npm run seed -w @scheduler/api"
+  }
+}
